@@ -277,7 +277,9 @@ export default function EquityInput() {
                             </span>
                           </div>
                           <div className="text-xs text-gray-600 space-y-1">
-                            <div>Granted: {grant.grantDate.toLocaleDateString()}</div>
+                            <div>Granted: {grant.grantDate && !isNaN(grant.grantDate.getTime()) 
+                              ? grant.grantDate.toLocaleDateString() 
+                              : 'Invalid Date'}</div>
                             {grant.type !== 'ESPP' && (
                               <div>Vesting: {grant.vestingSchedule.totalYears}y {grant.vestingSchedule.frequency}</div>
                             )}
@@ -484,8 +486,15 @@ export default function EquityInput() {
                       </label>
                       <input
                         type="date"
-                        value={selectedGrantData.grantDate.toISOString().split('T')[0]}
-                        onChange={(e) => updateGrant(selectedGrantData.id, { grantDate: new Date(e.target.value) })}
+                        value={selectedGrantData.grantDate && !isNaN(selectedGrantData.grantDate.getTime()) 
+                          ? selectedGrantData.grantDate.toISOString().split('T')[0] 
+                          : new Date().toISOString().split('T')[0]}
+                        onChange={(e) => {
+                          // Only update if the date is valid and not empty
+                          if (e.target.value && !isNaN(new Date(e.target.value).getTime())) {
+                            updateGrant(selectedGrantData.id, { grantDate: new Date(e.target.value) });
+                          }
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
@@ -590,8 +599,15 @@ export default function EquityInput() {
                     </label>
                     <input
                       type="date"
-                      value={selectedGrantData.vestingStart.toISOString().split('T')[0]}
-                      onChange={(e) => updateGrant(selectedGrantData.id, { vestingStart: new Date(e.target.value) })}
+                                              value={selectedGrantData.vestingStart && !isNaN(selectedGrantData.vestingStart.getTime())
+                          ? selectedGrantData.vestingStart.toISOString().split('T')[0]
+                          : new Date().toISOString().split('T')[0]}
+                      onChange={(e) => {
+                        // Only update if the date is valid and not empty
+                        if (e.target.value && !isNaN(new Date(e.target.value).getTime())) {
+                          updateGrant(selectedGrantData.id, { vestingStart: new Date(e.target.value) });
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
