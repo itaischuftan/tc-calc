@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DatePicker } from '@/components/ui/date-picker';
 import { useAnalytics } from '@/utils/analytics';
 
 export default function EquityInput() {
@@ -54,27 +55,8 @@ export default function EquityInput() {
   };
 
   const updateGrant = (grantId: string, updates: Partial<EquityGrant>) => {
-    // Validate and sanitize date fields to prevent invalid dates
-    const sanitizedUpdates = { ...updates };
-    
-    // Sanitize grantDate
-    if (sanitizedUpdates.grantDate) {
-      if (!(sanitizedUpdates.grantDate instanceof Date) || isNaN(sanitizedUpdates.grantDate.getTime())) {
-        console.warn('Invalid grantDate provided, skipping update');
-        delete sanitizedUpdates.grantDate;
-      }
-    }
-    
-    // Sanitize vestingStart
-    if (sanitizedUpdates.vestingStart) {
-      if (!(sanitizedUpdates.vestingStart instanceof Date) || isNaN(sanitizedUpdates.vestingStart.getTime())) {
-        console.warn('Invalid vestingStart provided, skipping update');
-        delete sanitizedUpdates.vestingStart;
-      }
-    }
-    
     const updatedGrants = equity.grants.map(grant =>
-      grant.id === grantId ? { ...grant, ...sanitizedUpdates } : grant
+      grant.id === grantId ? { ...grant, ...updates } : grant
     );
     handleEquityChange({ grants: updatedGrants });
   };
@@ -105,21 +87,7 @@ export default function EquityInput() {
     }
   };
 
-  const selectedGrantData = selectedGrant ? (() => {
-    const grant = equity.grants.find(g => g.id === selectedGrant);
-    if (!grant) return null;
-    
-    // Ensure dates are valid before rendering
-    const sanitizedGrant = { ...grant };
-    if (!grant.grantDate || !(grant.grantDate instanceof Date) || isNaN(grant.grantDate.getTime())) {
-      sanitizedGrant.grantDate = new Date();
-    }
-    if (!grant.vestingStart || !(grant.vestingStart instanceof Date) || isNaN(grant.vestingStart.getTime())) {
-      sanitizedGrant.vestingStart = new Date();
-    }
-    
-    return sanitizedGrant;
-  })() : null;
+  const selectedGrantData = selectedGrant ? equity.grants.find(g => g.id === selectedGrant) : null;
 
   // Calculate total equity value for preview
   const totalEquityValue = equity.grants.reduce((total, grant) => {
@@ -194,37 +162,7 @@ export default function EquityInput() {
     }
   }, [equity.grants, selectedGrant]);
 
-  // Sanitize any existing invalid dates on component mount
-  useEffect(() => {
-    if (equity.grants.length === 0) return;
-    
-    let hasInvalidDates = false;
-    const sanitizedGrants = equity.grants.map(grant => {
-      const sanitized = { ...grant };
-      
-      // Fix invalid grantDate
-      if (!grant.grantDate || !(grant.grantDate instanceof Date) || isNaN(grant.grantDate.getTime())) {
-        sanitized.grantDate = new Date();
-        hasInvalidDates = true;
-        console.warn(`Fixed invalid grantDate for grant ${grant.id}`);
-      }
-      
-      // Fix invalid vestingStart
-      if (!grant.vestingStart || !(grant.vestingStart instanceof Date) || isNaN(grant.vestingStart.getTime())) {
-        sanitized.vestingStart = new Date();
-        hasInvalidDates = true;
-        console.warn(`Fixed invalid vestingStart for grant ${grant.id}`);
-      }
-      
-      return sanitized;
-    });
-    
-    // Update grants if any were sanitized
-    if (hasInvalidDates) {
-      console.log('Sanitizing invalid dates in equity grants');
-      handleEquityChange({ grants: sanitizedGrants });
-    }
-  }, [equity.grants.length]); // Only run when grants array length changes
+
 
   return (
     <div className="space-y-6">
@@ -342,9 +280,7 @@ export default function EquityInput() {
                             </span>
                           </div>
                           <div className="text-xs text-gray-600 space-y-1">
-                            <div>Granted: {grant.grantDate && !isNaN(grant.grantDate.getTime()) 
-                              ? grant.grantDate.toLocaleDateString() 
-                              : 'Invalid Date'}</div>
+                            <div>Granted: {grant.grantDate ? grant.grantDate.toLocaleDateString() : 'No Date'}</div>
                             {grant.type !== 'ESPP' && (
                               <div>Vesting: {grant.vestingSchedule.totalYears}y {grant.vestingSchedule.frequency}</div>
                             )}
@@ -549,26 +485,14 @@ export default function EquityInput() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Grant Date
                       </label>
-                      <input
-                        type="date"
-                        value={selectedGrantData.grantDate && !isNaN(selectedGrantData.grantDate.getTime()) 
-                          ? selectedGrantData.grantDate.toISOString().split('T')[0] 
-                          : new Date().toISOString().split('T')[0]}
-                        onChange={(e) => {
-                          // Only update if the date is valid and not empty
-                          const dateValue = e.target.value;
-                          if (dateValue && dateValue.trim() !== '') {
-                            try {
-                              const newDate = new Date(dateValue);
-                              if (!isNaN(newDate.getTime()) && newDate.getFullYear() > 1900 && newDate.getFullYear() < 2100) {
-                                updateGrant(selectedGrantData.id, { grantDate: newDate });
-                              }
-                            } catch (error) {
-                              console.warn('Invalid date value:', dateValue);
-                            }
+                      <DatePicker
+                        selected={selectedGrantData.grantDate}
+                        onSelect={(date) => {
+                          if (date) {
+                            updateGrant(selectedGrantData.id, { grantDate: date });
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Select grant date"
                       />
                     </div>
 
@@ -670,26 +594,14 @@ export default function EquityInput() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Vesting Start Date
                     </label>
-                    <input
-                      type="date"
-                                              value={selectedGrantData.vestingStart && !isNaN(selectedGrantData.vestingStart.getTime())
-                          ? selectedGrantData.vestingStart.toISOString().split('T')[0]
-                          : new Date().toISOString().split('T')[0]}
-                      onChange={(e) => {
-                        // Only update if the date is valid and not empty
-                        const dateValue = e.target.value;
-                        if (dateValue && dateValue.trim() !== '') {
-                          try {
-                            const newDate = new Date(dateValue);
-                            if (!isNaN(newDate.getTime()) && newDate.getFullYear() > 1900 && newDate.getFullYear() < 2100) {
-                              updateGrant(selectedGrantData.id, { vestingStart: newDate });
-                            }
-                          } catch (error) {
-                            console.warn('Invalid vesting start date value:', dateValue);
-                          }
+                    <DatePicker
+                      selected={selectedGrantData.vestingStart}
+                      onSelect={(date) => {
+                        if (date) {
+                          updateGrant(selectedGrantData.id, { vestingStart: date });
                         }
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Select vesting start date"
                     />
                   </div>
                 </TabsContent>
