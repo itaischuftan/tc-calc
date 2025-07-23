@@ -1,0 +1,30 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://israeli-tech-compensation.vercel.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block specific paths if needed (none for now)
+# Disallow: /private/
+
+# Allow all static assets
+Allow: /_next/static/
+Allow: /favicon.ico
+Allow: /manifest.json
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
+Allow: /*.css$
+Allow: /*.js$ 
