@@ -2,7 +2,6 @@
   "version": 2,
   "alias": ["israeli-tech-compensation.vercel.app"],
   "public": true,
-  "deploymentProtection": null,
   "github": {
     "silent": true
   },
