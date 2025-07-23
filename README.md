@@ -80,7 +80,7 @@ This isn't just another salary calculator - it's a **comprehensive compensation 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/tc-calc.git
+git clone git@github.com:itaischuftan/tc-calc.git
 cd tc-calc
 
 # Install dependencies
@@ -275,7 +275,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   
 **Start optimizing your tech compensation today!**
 
-[🔗 **Live Demo**](https://israeli-tech-compensation.vercel.app) | [📱 **Install PWA**](https://israeli-tech-compensation.vercel.app) | [🐛 **Report Issues**](https://github.com/yourusername/tc-calc/issues)
+[🔗 **Live Demo**](https://tc-calc.vercel.app) | [📱 **Install PWA**](https://tc-calc.vercel.app) | [🐛 **Report Issues**](https://github.com/itaischuftan/tc-calc/issues)
 
 ---
 
@@ -291,7 +291,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *Helping Israeli techies make better compensation decisions, one calculation at a time.*
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/tc-calc?style=social)](https://github.com/yourusername/tc-calc)
-[![Twitter Follow](https://img.shields.io/twitter/follow/yourusername?style=social)](https://twitter.com/yourusername)
+[![GitHub stars](https://img.shields.io/github/stars/itaischuftan/tc-calc?style=social)](https://github.com/itaischuftan/tc-calc)
 
 </div>
